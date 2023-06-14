@@ -8,7 +8,10 @@ class Project(models.Model):
     last_update_on = models.DateTimeField(auto_now=True)
 
     def get_most_recent_project():
-        return Project.objects.latest('last_update_on')
+        try:
+             return Project.objects.latest('last_update_on')
+        except Exception:
+            print('i failed')
 
 
 
@@ -37,4 +40,8 @@ class ProjectTasks(models.Model):
     last_update_on = models.DateTimeField(auto_now=True)
 
     def get_most_recent_task():
-        return ProjectTasks.objects.latest('last_update_on')
+        try:
+            return ProjectTasks.objects.latest('last_update_on')
+        except Exception:
+            print('i failed 2')
+
