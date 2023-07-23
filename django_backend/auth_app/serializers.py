@@ -5,7 +5,6 @@ from django.contrib.auth.hashers import make_password
 
 
 class SignupSerializer(serializers.ModelSerializer):
-    """override create method to change the password into hash."""
     def create(self, validated_data):
             validated_data["password"] = make_password(validated_data.get("password"))
             return super(SignupSerializer, self).create(validated_data)
