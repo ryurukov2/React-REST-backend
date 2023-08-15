@@ -29,7 +29,9 @@ class LoginAPIView(APIView):
                     username = serializer.validated_data["username"]
                     password = serializer.validated_data["password"]
                     user = authenticate(request, username=username, password=password)
+                    print(user)
                     if user is not None:
+                       
                         token, _ = Token.objects.get_or_create(user=user)
                         response = {
                                "status": status.HTTP_200_OK,
@@ -38,6 +40,11 @@ class LoginAPIView(APIView):
                                        "Token" : token.key
                                        }
                                }
+                        
+                        login(request, user)
+                        print(request.user)
+                        r = Response(response, status = status.HTTP_200_OK)
+                        print(f'cookies - {r.cookies}')
                         return Response(response, status = status.HTTP_200_OK)
                     else :
                         response = {
@@ -64,6 +71,8 @@ class LogoutAPIView(APIView):
                 token = request.headers['Authorization'].split(' ', 1)[1]
                 dbToken=Token.objects.get(key=token)
                 dbToken.delete()
+                print(request.user)
+                logout(request)
             except Exception as e:
                 print(e)
                 return Response("Error", status=400)

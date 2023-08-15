@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import Project, ProjectTasks
 from .serializers import ProjectSerializer, TaskSerializer
+from rest_framework.authentication import TokenAuthentication
 # Create your views here.
 
 
@@ -69,6 +70,7 @@ class TasksDeleteView(generics.DestroyAPIView):
 class TaskGetLastEditedView(generics.ListAPIView):
     serializer_class_ProjectTasks = TaskSerializer
     serializer_class_Project = ProjectSerializer
+    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     # queryset = ProjectTasks.objects.filter(id=last_project.id)
     def get_queryset_ProjectTasks(self):
@@ -82,6 +84,7 @@ class TaskGetLastEditedView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         print(request.headers['Authorization'])
+        print(f'a {request.user}')
         tasks = self.serializer_class_ProjectTasks(self.get_queryset_ProjectTasks(), many=True)
         project = self.serializer_class_Project(self.get_queryset_Project(tasks.data[0]['project']), many=False)
         return Response({"project": project.data,
