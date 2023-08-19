@@ -3,10 +3,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework import status
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
 
 
-from .wrappers import header_checker
 
 from .serializers import LoginSerializer, SignupSerializer
 

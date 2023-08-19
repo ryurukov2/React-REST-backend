@@ -1,18 +1,16 @@
-# from time import sleep
-# from django.http import JsonResponse
-# from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import Project, ProjectTasks
 from .serializers import ProjectSerializer, TaskSerializer
 from rest_framework.authentication import TokenAuthentication
-# Create your views here.
 
 
 class CreateProjectsView(generics.CreateAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
 
 class ListProjectsView(generics.ListAPIView):
@@ -20,9 +18,11 @@ class ListProjectsView(generics.ListAPIView):
     serializer_class = ProjectSerializer
 
 
+
 class ProjectDeleteView(generics.DestroyAPIView):
     
     serializer_class = ProjectSerializer
+    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -30,6 +30,8 @@ class ProjectDeleteView(generics.DestroyAPIView):
         return Project.objects.filter(id=project_id)
 
 class ProjectDetailView(generics.RetrieveAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     serializer_class = ProjectSerializer
 
@@ -40,6 +42,9 @@ class ProjectDetailView(generics.RetrieveAPIView):
 class TasksListView(generics.ListAPIView):
     serializer_class = TaskSerializer
     pagination_class = None
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
 
     def get_queryset(self):
         project_id = self.kwargs['project_id']
@@ -47,11 +52,14 @@ class TasksListView(generics.ListAPIView):
     
     
 class TasksCreateView(generics.CreateAPIView):
-    # queryset = ProjectTasks.objects.all()
     serializer_class = TaskSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
 
 class TasksEditView(generics.UpdateAPIView):
-    
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     serializer_class = TaskSerializer
     def get_queryset(self):
         task_id=self.kwargs['pk']
@@ -60,7 +68,8 @@ class TasksEditView(generics.UpdateAPIView):
 
 class TasksDeleteView(generics.DestroyAPIView):
     serializer_class = TaskSerializer
-
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         task_id=self.kwargs['pk']
@@ -72,7 +81,6 @@ class TaskGetLastEditedView(generics.ListAPIView):
     serializer_class_Project = ProjectSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-    # queryset = ProjectTasks.objects.filter(id=last_project.id)
     def get_queryset_ProjectTasks(self):
         last_task = ProjectTasks.get_most_recent_task()
         return ProjectTasks.objects.filter(project=last_task.project).order_by('-last_update_on')
