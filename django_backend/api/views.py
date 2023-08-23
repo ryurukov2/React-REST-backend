@@ -16,7 +16,8 @@ class CreateProjectsView(generics.CreateAPIView):
 class ListProjectsView(generics.ListAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
 
 class ProjectDeleteView(generics.DestroyAPIView):
