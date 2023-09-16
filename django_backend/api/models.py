@@ -1,22 +1,24 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 
 class Project(models.Model):
     name = models.CharField(max_length=64, default='project', unique=False)
     description = models.TextField(null=True, blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner')
     last_update_on = models.DateTimeField(auto_now=True)
-
-    def get_most_recent_project():
+    assigned = models.ManyToManyField(User, related_name='assigned')
+    def get_most_recent_project(user_id):
         try:
-             return Project.objects.latest('last_update_on')
+             return Project.objects.filter(owner=user_id).latest('last_update_on')
         except Exception:
             print('i failed')
+            return None
 
 
 
 class ProjectTasks(models.Model):
-    project = models.ForeignKey("Project", on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
     class Priority(models.IntegerChoices):
         VITAL = 5
@@ -39,9 +41,9 @@ class ProjectTasks(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     last_update_on = models.DateTimeField(auto_now=True)
 
-    def get_most_recent_task():
+    def get_most_recent_task(user_id):
         try:
-            return ProjectTasks.objects.latest('last_update_on')
-        except Exception:
-            print('i failed 2')
+            return ProjectTasks.objects.filter(project__owner=user_id).latest('last_update_on')
+        except Exception as e:
+            return None
 

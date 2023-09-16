@@ -6,8 +6,8 @@ from .models import Project, ProjectTasks
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ('id', 'name', 'description', 'last_update_on', 'created_on')
-
+        fields = ('id', 'name', 'description', 'last_update_on', 'created_on', 'owner')
+        read_only_fields = ('owner',)
 
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
