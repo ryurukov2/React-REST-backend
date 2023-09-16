@@ -6,7 +6,6 @@ from .models import Project, ProjectTasks
 class IsProjectOwner(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
-        print('f')
 
         if(type(obj)==Project):
             return obj.owner == request.user
@@ -15,7 +14,6 @@ class IsProjectOwner(permissions.BasePermission):
     
 class IsProjectOwnerOrAssigned(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        print('a')
         if(type(obj)==Project):
             _ = (obj.owner == request.user or request.user in obj.assigned.all())
         elif(type(obj==ProjectTasks)):

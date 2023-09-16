@@ -13,5 +13,4 @@ def update_project_last_updated_on(sender, instance, **kwargs):
 @receiver(post_delete, sender=ProjectTasks)
 def update_project_last_updated_on_delete(sender, instance, **kwargs):
     project = instance.project
-    print('from d')
     project.save()

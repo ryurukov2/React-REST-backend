@@ -92,10 +92,6 @@ class TasksDeleteView(generics.DestroyAPIView):
     serializer_class = TaskSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, IsProjectOwner]
-
-    def perform_destroy(self, instance):
-        print('hi')
-        return super().perform_destroy(instance)
     def get_queryset(self):
         task_id = self.kwargs['pk']
         return ProjectTasks.objects.filter(id=task_id)
