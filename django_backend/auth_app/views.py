@@ -12,6 +12,7 @@ class SignupAPIView(APIView):
     def post(self,request):
             serializer = SignupSerializer(data = request.data)
             if serializer.is_valid():
+                    print(serializer.validated_data)
                     serializer.save()
                     token = Token.objects.create(user=serializer.instance)
                     res = { 'status' : status.HTTP_201_CREATED }
@@ -42,7 +43,7 @@ class LoginAPIView(APIView):
                         login(request, user)
                         print(request.user)
                         r = Response(response, status = status.HTTP_200_OK)
-                        print(f'cookies - {r.cookies}')
+                        # print(f'cookies - {r.cookies}')
                         return Response(response, status = status.HTTP_200_OK)
                     else :
                         response = {

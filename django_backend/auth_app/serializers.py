@@ -10,7 +10,7 @@ class SignupSerializer(serializers.ModelSerializer):
             return super(SignupSerializer, self).create(validated_data)
     class Meta:
             model = User
-            fields = ['username','password']
+            fields = ['username','password', 'email']
 
 class LoginSerializer(serializers.ModelSerializer):
     username = serializers.CharField()

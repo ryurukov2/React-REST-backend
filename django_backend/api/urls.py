@@ -15,4 +15,6 @@ urlpatterns = [
     path('task/<int:pk>/edit', TasksEditView.as_view(), name='task edit'),
     path('task/<int:pk>/remove', TasksDeleteView.as_view(), name='task edit'),
     path('tasks/last_edited', TaskGetLastEditedView.as_view(), name='last edited'),
+    path('projects/<int:pk>/add_assignee', AddAssigneeView.as_view(), name='add assignee'),
+    
     ]

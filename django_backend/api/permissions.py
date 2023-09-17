@@ -15,10 +15,10 @@ class IsProjectOwner(permissions.BasePermission):
 class IsProjectOwnerOrAssigned(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if(type(obj)==Project):
-            _ = (obj.owner == request.user or request.user in obj.assigned.all())
+            result = (obj.owner == request.user or request.user in obj.assigned.all())
         elif(type(obj==ProjectTasks)):
             print(obj.project.owner)
-            _ = (obj.project.owner == request.user or request.user in obj.project.assigned.all())
-        # print(_)
-        return _ 
+            result = (obj.project.owner == request.user or request.user in obj.project.assigned.all())
+        # print(result)
+        return result 
 
