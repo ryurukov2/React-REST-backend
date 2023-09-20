@@ -149,25 +149,36 @@ class AddAssigneeView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated, IsProjectOwnerOrAssigned]
 
     def update(self, request, *args, **kwargs):
-        # Fetch the project instance
         project = self.get_object()
-        # print(f'id = {project.id}')
-        # if request.user != project.owner:
-        #     return Response({"error": "You do not have permission to modify this project"}, status=status.HTTP_403_FORBIDDEN)
         print(request.data['user_email'])
-        # serializer = self.get_serializer(data=request.data)
-        # serializer.is_valid(raise_exception=True)
-
-        # user_email = serializer.validated_data['user_email']
         user_email = request.data['user_email']
-        # print(f'userid = {user_id}')       
         try:
             user_to_assign = User.objects.get(email=user_email)
         except User.DoesNotExist:
-            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Add the user to the project's assigned field
         project.assigned.add(user_to_assign)
         project.save()
 
-        return Response({"message": "Assignee added successfully!"}, status=status.HTTP_200_OK)
+        return Response({"detail": "Assignee added successfully!"}, status=status.HTTP_200_OK)
+    
+class RetrieveProjectOwnerView(generics.RetrieveAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, IsProjectOwnerOrAssigned]
+    # queryset = User.objects.all()
+    
+
+    def get_queryset(self):
+        project_id = self.kwargs.get('pk')
+        project = Project.objects.filter(id=project_id)
+        return project
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        return Response({"owner": instance.owner.username, "status": 200}, status=status.HTTP_200_OK)   
+
+class ListProjectAssigned(generics.ListAPIView):
+    serializer_class = ProjectSerializer
+    def get_queryset(self):
+        project_id = self.kwargs.get('pk')
+        return Project.objects.filter(id=project_id)
