@@ -3,7 +3,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import Project, ProjectTasks
-from .serializers import AssigneeSerializer, ProjectSerializer, TaskSerializer
+from .serializers import AssigneeSerializer, AddAssigneeSerializer, ProjectSerializer, TaskSerializer
 from rest_framework.authentication import TokenAuthentication
 from .permissions import IsProjectOwner, IsProjectOwnerOrAssigned
 from django.core.exceptions import PermissionDenied
@@ -22,16 +22,13 @@ class CreateProjectsView(generics.CreateAPIView):
 
 
 class ListProjectsView(generics.ListAPIView):
-    # queryset = Project.objects.filter(created_by=)
-    # queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
-        r = Project.objects.filter(Q(owner=user.id)| Q(assigned=user.id))
-        # print(r)
+        r = Project.objects.filter(Q(owner=user.id)| Q(assigned=user.id)).distinct()
         return r
 
 
@@ -129,31 +126,18 @@ class TaskGetLastEditedView(generics.ListAPIView):
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
         
-
-
-# class AddAssigneeView(generics.UpdateAPIView):
-#     serializer_class=ProjectSerializer
-#     # authentication_classes = [TokenAuthentication]
-#     # permission_classes = [IsAuthenticated, IsProjectOwnerOrAssigned]
-
-#     def get_queryset(self):
-#         task_id = self.kwargs.get('pk')
-#         print(self.request.data)
-#         print(task_id)
-#         return get_object_or_404(Project, id=task_id)
-    
 class AddAssigneeView(generics.UpdateAPIView):
     queryset = Project.objects.all()
-    serializer_class = AssigneeSerializer
+    serializer_class = AddAssigneeSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, IsProjectOwnerOrAssigned]
 
     def update(self, request, *args, **kwargs):
         project = self.get_object()
-        print(request.data['user_email'])
-        user_email = request.data['user_email']
+        print(request.data['username'])
+        assigneeUsername = request.data['username']
         try:
-            user_to_assign = User.objects.get(email=user_email)
+            user_to_assign = User.objects.get(username=assigneeUsername)
         except User.DoesNotExist:
             return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -178,7 +162,16 @@ class RetrieveProjectOwnerView(generics.RetrieveAPIView):
         return Response({"owner": instance.owner.username, "status": 200}, status=status.HTTP_200_OK)   
 
 class ListProjectAssigned(generics.ListAPIView):
-    serializer_class = ProjectSerializer
+    serializer_class = AssigneeSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, IsProjectOwnerOrAssigned]
+    
+
     def get_queryset(self):
         project_id = self.kwargs.get('pk')
-        return Project.objects.filter(id=project_id)
+        try:
+            project = Project.objects.get(id=project_id)
+        except Project.DoesNotExist:
+            return User.objects.none()
+        
+        return project.assigned.all()

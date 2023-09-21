@@ -17,6 +17,6 @@ urlpatterns = [
     path('tasks/last_edited', TaskGetLastEditedView.as_view(), name='last edited'),
     path('projects/<int:pk>/add_assignee', AddAssigneeView.as_view(), name='add assignee'),
     path('projects/<int:pk>/retrieve_owner', RetrieveProjectOwnerView.as_view(), name='retrieve owner'),
-    path('projects/<int:pk>/retrieve_assigned', ListProjectAssigned.as_view(), name='retrieve assigned'),
+    path('projects/<int:pk>/list_assigned', ListProjectAssigned.as_view(), name='list assigned'),
     
     ]
