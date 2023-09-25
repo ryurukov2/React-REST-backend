@@ -9,6 +9,7 @@ from .permissions import IsProjectOwner, IsProjectOwnerOrAssigned
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import User
 from django.db.models import Q
+from rest_framework.views import APIView
 
 
 class CreateProjectsView(generics.CreateAPIView):
@@ -175,3 +176,26 @@ class ListProjectAssigned(generics.ListAPIView):
             return User.objects.none()
         
         return project.assigned.all()
+
+class DashboardView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request, format=None):
+        username=request.user.username
+        owner_of = Project.objects.filter(owner=request.user).count()
+        assigned_to = Project.objects.filter(assigned=request.user).count()
+        non_resolved_tasks = ProjectTasks.objects.filter((Q(project__assigned=request.user)|Q(project__owner=request.user))&~Q(completion_status='RESOLVED')).count()
+        resolved_tasks = ProjectTasks.objects.filter((Q(project__assigned=request.user)|Q(project__owner=request.user))&Q(completion_status='RESOLVED')).count()
+        todo_tasks = ProjectTasks.objects.filter((Q(project__assigned=request.user)|Q(project__owner=request.user))&Q(completion_status='TODO')).count()
+        
+        print(username)
+
+        data = {
+            'username': username,
+            'owner_of': owner_of,  
+            'assigned_to': assigned_to,
+            'non_resolved_tasks': non_resolved_tasks,
+            'resolved_tasks': resolved_tasks,
+            'todo_tasks': todo_tasks
+        }
+        return Response(data, status=status.HTTP_200_OK)
