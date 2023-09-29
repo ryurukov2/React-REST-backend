@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 class Project(models.Model):
     name = models.CharField(max_length=64, default='project', unique=False)
@@ -10,9 +11,8 @@ class Project(models.Model):
     assigned = models.ManyToManyField(User, related_name='assigned')
     def get_most_recent_project(user_id):
         try:
-             return Project.objects.filter(owner=user_id).latest('last_update_on')
+             return Project.objects.filter(Q(owner=user_id)|Q(assigned=user_id)).latest('last_update_on')
         except Exception:
-            print('i failed')
             return None
 
 
@@ -43,7 +43,7 @@ class ProjectTasks(models.Model):
 
     def get_most_recent_task(user_id):
         try:
-            return ProjectTasks.objects.filter(project__owner=user_id).latest('last_update_on')
+            return ProjectTasks.objects.filter(Q(project__owner=user_id)|Q(project__assigned=user_id)).latest('last_update_on')
         except Exception as e:
             return None
 

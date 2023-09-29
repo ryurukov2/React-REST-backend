@@ -23,3 +23,11 @@ class AssigneeSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username')
+
+class CompletionStatusCountSerializer(serializers.Serializer):
+    completion_status = serializers.CharField()
+    count = serializers.IntegerField()
+
+class PriorityCountSerializer(serializers.Serializer):
+    priority = serializers.IntegerField()
+    count = serializers.IntegerField()
