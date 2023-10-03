@@ -8,7 +8,7 @@ class Project(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner')
     last_update_on = models.DateTimeField(auto_now=True)
-    assigned = models.ManyToManyField(User, related_name='assigned')
+    assigned = models.ManyToManyField(User, related_name='assigned', blank=True)
     def get_most_recent_project(user_id):
         try:
              return Project.objects.filter(Q(owner=user_id)|Q(assigned=user_id)).latest('last_update_on')

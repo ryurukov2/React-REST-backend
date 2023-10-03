@@ -177,7 +177,7 @@ class ListProjectAssigned(generics.ListAPIView):
         except Project.DoesNotExist:
             return User.objects.none()
 
-        return project.assigned.all()
+        return project.assigned.all().order_by('id')
 
 
 class DashboardView(APIView):
@@ -207,10 +207,6 @@ class DashboardView(APIView):
         }
         return Response(data, status=status.HTTP_200_OK)
 
-# average number of tasks per project
-# average priority of tasks
-# number of "completed" projects (if all tasks are with status RESOLVED)
-#
 
 
 class AnalyticsView(APIView):
